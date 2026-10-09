@@ -2,3 +2,8 @@
 .vscode/browse.vc.db*
 .vscode/*.db
 .vscode/ipch/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
