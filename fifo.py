@@ -1,6 +1,5 @@
 from collections import deque
 
-
 def fifo(refs, n_frames):
     """FIFO 分頁置換演算法：記憶體滿了就換出最早載入的頁
     refs：參考字串 [(頁號, 是否寫入), ...]

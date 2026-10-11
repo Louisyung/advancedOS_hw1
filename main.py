@@ -1,6 +1,6 @@
 import math
 import random
-import fifo
+import FIFO
 
 PAGE_MIN = 1          # 最小頁號
 PAGE_MAX = 1500       # 最大頁號
@@ -16,7 +16,7 @@ N_OUTPUTS = 35        # 每筆資料的輸出數（B、C 的行數）
 ELEMS_PER_PAGE = 36   # 一頁可放 36 個元素，每一列都從新的一頁開始存放
 SPARSITY = 0.1        # 特徵值為 0 的機率，為 0 時乘積必為 0，可跳過不算
 
-A_ROW_PAGES = math.ceil(N_FEATURES / ELEMS_PER_PAGE)   # A 3
+A_ROW_PAGES = math.ceil(N_FEATURES / ELEMS_PER_PAGE)   # A 一列佔 17 頁
 B_ROW_PAGES = math.ceil(N_OUTPUTS / ELEMS_PER_PAGE)    # B 一列佔 1 頁
 C_ROW_PAGES = B_ROW_PAGES                              # C 一列和 B 一列一樣是 35 個元素
 
@@ -113,10 +113,10 @@ if __name__ == "__main__":
     locality_refs = generate_locality(N_REFS, WRITE_PROB)
     matrix_refs = generate_matrix(N_REFS)
 
-    print_stats("Random", random_refs)
-    print_stats("Locality", locality_refs)
-    print_stats("Matrix", matrix_refs)
+    # print_stats("Random", random_refs)
+    # print_stats("Locality", locality_refs)
+    # print_stats("Matrix", matrix_refs)
 
-    print_results("FIFO", "Random", fifo.fifo, random_refs)
-    print_results("FIFO", "Locality", fifo.fifo, locality_refs)
-    print_results("FIFO", "Matrix", fifo.fifo, matrix_refs)
+    print_results("FIFO", "Random", FIFO.fifo, random_refs)
+    print_results("FIFO", "Locality", FIFO.fifo, locality_refs)
+    print_results("FIFO", "Matrix", FIFO.fifo, matrix_refs)
