@@ -1,3 +1,5 @@
+
+
 # 開始寫之前，先回答自己三個問題。這三個也是報告裡要寫的設計決策：
 
 # 1. count 什麼時候歸零？ 一頁被換出、之後又載入時，count 要從頭算，還是延續以前的累計？
@@ -41,7 +43,7 @@
 # ├──────────────────────────────────────────────────┼─────────────────────────────────────────────────┤
 # │ mfu(S([1,2,3,4,1,2]), 3)                         │ (6, 6, 0)：count 全部平手，每次都換最早載入的頁 │
 # ├──────────────────────────────────────────────────┼─────────────────────────────────────────────────┤
-# │ mfu([(1,True),(1,False),(2,False),(3,False)], 2) │ (3, 4, 1)：頁 1 是 dirty，被換出時要寫回        │
+# │ mfu([(1,True),(1,False),(2,False),(3,False)], 2) │ (3, 4, 1)：頁 1 是 dirty，被換出時要寫回(write_disk)│
 # └──────────────────────────────────────────────────┴─────────────────────────────────────────────────┘
 
 # 如果你照上面的建議做（count 從頭算、平手時換最早載入的），main.py 跑出來的應該是：
@@ -57,3 +59,42 @@
 # └──────────┴─────────────────────────┴─────────────────────────┘
 
 # 數字對不上的話，先看小測資哪一個錯了，大概就知道是哪一步出問題。寫好或卡住的時候，把程式貼給我看。
+
+def mfu(refs, n_frames):
+    """MFU 分頁置換演算法：記憶體滿了就換出 count 最大的頁，平手時換最早載入的
+    refs：參考字串 [(頁號, 是否寫入), ...]
+    n_frames：主記憶體的 frame 數量
+    回傳 (page fault 次數, 中斷次數, 寫回磁碟的頁數)"""
+    count = {}            # 記憶體中的頁 → 存取次數，同時用來判斷頁是否在記憶體中
+    dirty = {}            # 記憶體中的頁 → dirty bit
+    load_time = {}        # 記憶體中的頁 → 載入時間，count 平手時用來挑最早載入的頁
+    faults = 0            # page fault 次數
+    interrupts = 0        # 中斷次數
+    disk_writes = 0       # 寫回磁碟的頁數
+    time = 0              # 目前時間（第幾次存取），載入新頁時存進 load_time
+
+    for page, is_write in refs:
+        time = time + 1   # 每次計數＋1
+        if page in count: # page hit
+            count[page] += 1
+            if is_write == 1:
+                dirty[page] = is_write
+            else:
+                continue
+            load_time[page] = time
+        else:             # page fault
+            fault += 1             
+            if len(count) == n_frames:  # frame已滿，需進行replacement
+                victim = max(count , key =lambda k: (count[k],-load_time[k]))
+                interrupts += 1 
+                del(count[victim])
+                del(dirty[victim])
+                del(load_time[victim])
+                load_time[victim] = time  
+                if dirty[victim] == 1:
+                    disk_writes += 1
+            else:
+                count[page] = 1 
+                dirty[page] = is_write
+                load_time[page] = time
+    return faults, interrupts, disk_writes
