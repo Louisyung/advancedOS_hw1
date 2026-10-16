@@ -1,6 +1,6 @@
 import math
 import random
-import FIFO,MFU
+import FIFO,MFU,ESC
 
 PAGE_MIN = 1          # 最小頁號
 PAGE_MAX = 1500       # 最大頁號
@@ -125,3 +125,7 @@ if __name__ == "__main__":
     print_results("MFU", "Random", MFU.mfu, random_refs)
     print_results("MFU", "Locality", MFU.mfu, locality_refs)
     print_results("MFU", "Matrix", MFU.mfu, matrix_refs)
+
+    print_results("ESC", "Random", ESC.esc, random_refs)
+    print_results("ESC", "Locality", ESC.esc, locality_refs)
+    print_results("ESC", "Matrix", ESC.esc, matrix_refs)
