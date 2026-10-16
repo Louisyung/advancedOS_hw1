@@ -77,24 +77,29 @@ def mfu(refs, n_frames):
         time = time + 1   # 每次計數＋1
         if page in count: # page hit
             count[page] += 1
-            if is_write == 1:
+            if is_write:
                 dirty[page] = is_write
             else:
                 continue
-            load_time[page] = time
         else:             # page fault
-            fault += 1             
+            faults += 1
+            interrupts += 1             
             if len(count) == n_frames:  # frame已滿，需進行replacement
                 victim = max(count , key =lambda k: (count[k],-load_time[k]))
-                interrupts += 1 
+                if dirty[victim]:       # 代表準備被替換的page有更改過
+                    disk_writes += 1
+                    interrupts += 1 
                 del(count[victim])
                 del(dirty[victim])
                 del(load_time[victim])
-                load_time[victim] = time  
-                if dirty[victim] == 1:
-                    disk_writes += 1
-            else:
                 count[page] = 1 
+                load_time[page] = time
+                if is_write:
+                    dirty[page] = 1 
+                else:
+                    dirty[page] = 0
+            else:                       # 直接將新頁寫入空frame
+                count[page] = 1   
                 dirty[page] = is_write
                 load_time[page] = time
     return faults, interrupts, disk_writes
